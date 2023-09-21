@@ -70,13 +70,15 @@ class export_attempt {
         }
 
         // idnumber currently not used...
-        if (empty($this->user_rec->idnumber)) {
+        // IT.Serv start: disable error if idnumber is empty (1/1) - 220216 treitmzt
+        /* if (empty($this->user_rec->idnumber)) {
 
             $exc = new \moodle_exception('except_usernoidnumber', 'local_quizattemptexport', '', $this->user_rec->id);
             $this->logmessage($exc->getMessage());
 
             throw $exc;
-        }
+        } */
+        // IT.Serv start: disable error if idnumber is empty (1/1)
 
         if ($this->exportfilesystem = get_config('local_quizattemptexport', 'exportfilesystem')) {
 
