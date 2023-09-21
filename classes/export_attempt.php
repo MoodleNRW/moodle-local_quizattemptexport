@@ -69,15 +69,6 @@ class export_attempt {
             throw $exc;
         }
 
-        // idnumber currently not used...
-        if (empty($this->user_rec->idnumber)) {
-
-            $exc = new \moodle_exception('except_usernoidnumber', 'local_quizattemptexport', '', $this->user_rec->id);
-            $this->logmessage($exc->getMessage());
-
-            throw $exc;
-        }
-
         if ($this->exportfilesystem = get_config('local_quizattemptexport', 'exportfilesystem')) {
 
             // Check export directory.
@@ -165,9 +156,10 @@ class export_attempt {
         $cm = $this->attempt_obj->get_cm();
         $instance = $DB->get_record('quiz', ['id' => $cm->instance]);
         $quizname = clean_param($instance->name, PARAM_FILE);
+        $quizname = str_replace(' ', '_', $quizname);
 
-        // The idnumber which is used for matriculation id.
-        $idnumber = $this->user_rec->idnumber;
+        // The users login name.
+        $username = $this->user_rec->username;
 
         // The attempts id for uniqueness.
         $attemptid = $this->attempt_obj->get_attemptid();
@@ -179,12 +171,11 @@ class export_attempt {
         $contenthash = hash('sha256', $tempfilecontent);
 
         // Piece the file name parts together.
-        $filename = $quizname . '_' . $idnumber . '_' . $attemptid . '_' . $time . '_' . $contenthash . '.pdf';
+        $filename = $quizname . '_' . $username . '_' . $attemptid . '_' . $time . '_' . $contenthash . '.pdf';
 
         // Write file into filesystem?
         if ($this->exportfilesystem) {
 
-            // TODO local filname might require milliseconds instead of seconds.
             // Write file into the defined export dir, so it may be archived using sftp.
             $localfilepath = $this->exportpath . '/' . $filename;
             file_put_contents($localfilepath, $tempfilecontent);

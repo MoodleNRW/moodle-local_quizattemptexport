@@ -25,6 +25,8 @@
 
 namespace local_quizattemptexport;
 
+use local_quizattemptexport\task\generate_pdf;
+
 defined('MOODLE_INTERNAL') || die();
 
 class util {
@@ -60,14 +62,13 @@ class util {
 
         // Construct subdir path.
         $course = $attempt->get_course();
-        //$coursename = clean_param($course->fullname, PARAM_SAFEDIR);
-        //$dirname = $course->id . '_' . $coursename;
-        $dirname = $course->id;
+        $cm = $attempt->get_cm();
+        $dirname = $course->id . '/' . $cm->id;
         $exportpath = $exportdir . '/' . $dirname;
 
         // Create the export path if missing.
         if (!is_dir($exportpath)) {
-            if (!mkdir($exportpath)) {
+            if (!mkdir($exportpath, 0777, true)) {
                 throw new \moodle_exception('except_dirnotwritable', 'local_quizattemptexport', '', $exportdir);
             }
         }
@@ -102,6 +103,58 @@ class util {
         }
 
         return $conf;
+    }
+
+
+    /**
+     * Small utility method that is to be called from install.php as well
+     * as upgrade.php to migrate data from the old branded HSNR version
+     * of this plugin.
+     *
+     * This is probably only a two times use, once on updating the QS
+     * system where the non-branded version is already installed, and
+     * second, when updating the live system where this will replace the
+     * old version directly.
+     *
+     * So we will have to call this migration code in installation as
+     * well as upgrade code.
+     *
+     * @throws \ddl_exception
+     * @throws \dml_exception
+     */
+    public static function migrate_old_hsnr_data() {
+        global $DB;
+
+        // Check if there will be anything to migrate.
+        $dbman = $DB->get_manager();
+        if (!$dbman->table_exists('quizattemptexport_hsnr')) {
+            return;
+        }
+
+        // Deactivate automatic export in old plugin version.
+        set_config('autoexport', 0, 'local_quizattemptexport_hsnr');
+
+        // Get "catfilter" config from old plugin.
+        $catfilter = get_config('local_quizattemptexport_hsnr', 'catfilter');
+
+        // Set "catfilter" config in this plugin.
+        set_config('catfilter', $catfilter, 'local_quizattemptexport');
+
+        // Get "exportdir" config from old plugin.
+        $exportdir = get_config('local_quizattemptexport_hsnr', 'pdfexportdir');
+
+        // Set "exportdir" config in this plugin.
+        set_config('pdfexportdir', $exportdir, 'local_quizattemptexport');
+
+        // Update component in mdl_files table for all files related to the branded plugin version.
+        $DB->set_field('files', 'component', 'local_quizattemptexport', ['component' => 'local_quizattemptexport_hsnr']);
+
+        // Migrate pending automatic exports from the branded version of the plugin to this version.
+        foreach ($DB->get_records('quizattemptexport_hsnr', ['status' => generate_pdf::STATUS_WAITING]) as $id => $record) {
+
+            unset($record->id);
+            $DB->insert_record('quizattemptexport', $record);
+        }
     }
 
 }

@@ -70,5 +70,13 @@ function xmldb_local_quizattemptexport_upgrade($oldversion) {
     }
 
 
+    if ($oldversion < 2022040501) {
+
+        // Call migration method for data of the old HSNR branded version of this plugin.
+        \local_quizattemptexport\util::migrate_old_hsnr_data();
+
+        upgrade_plugin_savepoint(true, 2022040501, 'local', 'quizattemptexport');
+    }
+
     return true;
 }

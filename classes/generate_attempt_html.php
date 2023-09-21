@@ -189,8 +189,8 @@ class generate_attempt_html {
             'coursename' => $course->fullname,
             'quizname' => $quiz->name,
             'studentname' => fullname($this->user_rec),
-            'matriculationid' => $this->user_rec->idnumber,
-            //'coursecode' => $coursecode,
+            'matriculationid' => $this->user_rec->username,
+            'coursecode' => $coursecode,
             'attemptstarted' => $attemptstartedtime,
             'attemptended' => $attemptsubmittedtime,
             'attemptresult' => $attemptresultstr

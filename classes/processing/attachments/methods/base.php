@@ -92,7 +92,7 @@ abstract class base {
             $fnamechunk_question = get_string('attachmentexport_filenamechunk_questionno', 'local_quizattemptexport');
             $fnamechunk_attachment = get_string('attachmentexport_filenamechunk_attachment', 'local_quizattemptexport');
 
-            $filename = $quizname . '_' . $user->idnumber . '_' . $attempt->get_attemptid() . '_' . $fnamechunk_question . $slot . '_'. $fnamechunk_attachment . '_' . $filenamepart . '_' . $contenthash . '.' . $filetype;
+            $filename = $quizname . '_' . $user->username . '_' . $attempt->get_attemptid() . '_' . $fnamechunk_question . $slot . '_'. $fnamechunk_attachment . '_' . $filenamepart . '_' . $contenthash . '.' . $filetype;
 
             $newfile = new \stdClass;
             $newfile->context = $context->id;

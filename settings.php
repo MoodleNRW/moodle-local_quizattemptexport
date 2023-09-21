@@ -41,6 +41,15 @@ if ($hassiteconfig) { // needs this condition or there is error on login page
             0)
     );
 
+    $categories = core_course_category::make_categories_list();
+    $settings->add(new admin_setting_configmultiselect(
+            'local_quizattemptexport/catfilter',
+            get_string('setting_catfilter', 'local_quizattemptexport'),
+            get_string('setting_catfilter_desc', 'local_quizattemptexport'),
+            [],
+            $categories)
+    );
+
     $settings->add(new admin_setting_configcheckbox('local_quizattemptexport/exportfilesystem',
             get_string('setting_exportfilesystem', 'local_quizattemptexport'),
             get_string('setting_exportfilesystem_desc', 'local_quizattemptexport'),

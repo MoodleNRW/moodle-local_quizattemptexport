@@ -43,10 +43,10 @@ $course = get_course($cm->course);
 
 // Check access.
 require_login($cm->course, false);
-$hasviewcap = has_capability('mod/quiz:viewreports', $context);
-$hasgradecap = has_capability('mod/quiz:grade', $context);
-if (!$hasviewcap && !$hasgradecap) {
-    $capability = 'mod/quiz:viewreports';
+$hasviewcap = has_capability('local/quizattemptexport:viewpdf', $context);
+$hasexportcap = has_capability('local/quizattemptexport:generatepdf', $context);
+if (!$hasviewcap && !$hasexportcap) {
+    $capability = 'local/quizattemptexport:viewpdf';
     throw new required_capability_exception($context, $capability, 'nopermission', '');
 }
 
@@ -106,7 +106,7 @@ if ($downloadzip) {
 }
 
 // Check if we should export an attempt.
-if ($hasgradecap && $reexportattemptid) {
+if ($hasexportcap && $reexportattemptid) {
 
     require_once $CFG->dirroot . '/mod/quiz/attemptlib.php';
     require_once $CFG->dirroot . '/mod/quiz/accessmanager.php';
@@ -123,7 +123,7 @@ if ($hasgradecap && $reexportattemptid) {
 }
 
 // Check if we should export all attempts.
-if ($hasgradecap && $reexportall) {
+if ($hasexportcap && $reexportall) {
 
     require_once $CFG->dirroot . '/mod/quiz/attemptlib.php';
     require_once $CFG->dirroot . '/mod/quiz/accessmanager.php';
@@ -198,5 +198,5 @@ foreach ($DB->get_records('quiz_attempts', ['quiz' => $instance->id, 'preview' =
 $renderer = $PAGE->get_renderer('local_quizattemptexport');
 
 echo $OUTPUT->header();
-echo $renderer->render_attemptexportlist($rawdata, $cm->id, $hasgradecap);
+echo $renderer->render_attemptexportlist($rawdata, $cm->id, $hasexportcap);
 echo $OUTPUT->footer();

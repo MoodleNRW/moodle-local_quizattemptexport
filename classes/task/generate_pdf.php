@@ -85,7 +85,7 @@ class generate_pdf extends \core\task\scheduled_task {
             // If MathJax typesetting is enabled we will have a specific delay applied
             // per PDF transformation. We have to account for that delay to avoid
             // blocking general execution of cron tasks.
-            $jsdelay = $conf->mathjaxdelay / 1000; // Value in milliseconds.
+            $jsdelay = $conf->mathjaxdelay / 1000; // mathjaxdelay value is in milliseconds.
             $attemptsperrun = floor(self::JSDELAY_CUTOFF_SECONDS / $jsdelay);
         }
         mtrace('Max attempts being processed: ' . $attemptsperrun);

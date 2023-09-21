@@ -40,7 +40,7 @@ function local_quizattemptexport_extend_settings_navigation(\settings_navigation
     }
 
     // Make sure the current user may see our settings node.
-    if (!has_any_capability(array('mod/quiz:viewreports', 'mod/quiz:grade'), $context)) {
+    if (!has_any_capability(array('local/quizattemptexport:viewpdf', 'local/quizattemptexport:generatepdf'), $context)) {
         return;
     }
 
@@ -93,7 +93,7 @@ function local_quizattemptexport_pluginfile($course, $cm, $context, $filearea, $
 
     // Make sure the user is logged in and has access to the module (plugins that are not course modules should leave out the 'cm' part).
     require_login();
-    require_capability('mod/quiz:viewreports', $context);
+    require_capability('local/quizattemptexport:viewpdf', $context);
 
     // Leave this line out if you set the itemid to null in make_pluginfile_url (set $itemid to 0 instead).
     $itemid = array_shift($args); // The first item in the $args array.
