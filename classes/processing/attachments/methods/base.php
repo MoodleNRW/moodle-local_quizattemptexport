@@ -92,7 +92,11 @@ abstract class base {
             $fnamechunk_question = get_string('attachmentexport_filenamechunk_questionno', 'local_quizattemptexport');
             $fnamechunk_attachment = get_string('attachmentexport_filenamechunk_attachment', 'local_quizattemptexport');
 
-            $filename = $quizname . '_' . $user->idnumber . '_' . $attempt->get_attemptid() . '_' . $fnamechunk_question . $slot . '_'. $fnamechunk_attachment . '_' . $filenamepart . '_' . $contenthash . '.' . $filetype;
+            // IT.Serv start: change filename pattern (1/1) - 220126 treitmzt
+            //ORIGINAL: $filename = $quizname . '_' . $user->idnumber . '_' . $attempt->get_attemptid() . '_' . $fnamechunk_question . $slot . '_'. $fnamechunk_attachment . '_' . $filenamepart . '_' . $contenthash . '.' . $filetype;
+            $convertedquizname = clean_param(\core_text::convert($quizname, 'utf-8', 'ascii'), PARAM_ALPHANUMEXT);
+            $filename = $user->idnumber. '_' . $convertedquizname . '_' . $attempt->get_attemptid() . '_' . $fnamechunk_question . $slot . '_'. $fnamechunk_attachment . '_' . $filenamepart . '_' . substr($contenthash,0,8) . '.' . $filetype;
+            // IT.Serv end: change filename pattern (1/1)
 
             $newfile = new \stdClass;
             $newfile->context = $context->id;

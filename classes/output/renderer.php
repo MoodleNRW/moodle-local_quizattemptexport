@@ -43,9 +43,15 @@ class renderer extends \plugin_renderer_base {
         foreach ($rawdata as $userid => $attempts) {
 
             $user = $DB->get_record('user', ['id' => $userid]);
+            //IT.Serv start: skip entry if user does not exist (1/1) 220223 treitmzt
+            if(false === $user) continue;
+            //IT.Serv end: skip entry if user does not exist (1/1) 
             $userdata = [
                 'fullname' => fullname($user),
-                'username' => $user->username,
+                //IT.Serv start: use field idnumber instead of username for table heading (1/1) 220124 treitmzt
+                //'username' => $user->username,
+                'username' => $user->idnumber,
+                //IT.Serv end: use field idnumber instead of username for table heading
                 'attempts' => []
             ];
 

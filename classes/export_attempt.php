@@ -62,7 +62,7 @@ class export_attempt {
         $this->logger = $log;
 
         if (!$this->user_rec = $DB->get_record('user', array('id' => $this->attempt_obj->get_userid()))) {
-
+            
             $exc = new \moodle_exception('except_usernotfound', 'local_quizattemptexport', '', $this->attempt_obj->get_userid());
             $this->logexception($exc);
 
@@ -70,13 +70,15 @@ class export_attempt {
         }
 
         // idnumber currently not used...
-        if (empty($this->user_rec->idnumber)) {
+        // IT.Serv start: disable error if idnumber is empty (1/1) - 220216 treitmzt
+        /* if (empty($this->user_rec->idnumber)) {
 
             $exc = new \moodle_exception('except_usernoidnumber', 'local_quizattemptexport', '', $this->user_rec->id);
             $this->logmessage($exc->getMessage());
 
             throw $exc;
-        }
+        } */
+        // IT.Serv start: disable error if idnumber is empty (1/1)
 
         if ($this->exportfilesystem = get_config('local_quizattemptexport', 'exportfilesystem')) {
 
@@ -179,7 +181,13 @@ class export_attempt {
         $contenthash = hash('sha256', $tempfilecontent);
 
         // Piece the file name parts together.
-        $filename = $quizname . '_' . $idnumber . '_' . $attemptid . '_' . $time . '_' . $contenthash . '.pdf';
+        // IT.Serv start: change filename pattern (1/1) - 220126 treitmzt
+        //ORIGINAL: $filename = $quizname . '_' . $username . '_' . $attemptid . '_' . $time . '_' . $contenthash . '.pdf';
+        //$fullname = clean_param(\core_text::convert($this->user_rec->lastname.'_'.$this->user_rec->firstname, 'utf-8', 'ascii'), PARAM_ALPHANUMEXT);
+        $convertedquizname = clean_param(\core_text::convert($quizname, 'utf-8', 'ascii'), PARAM_ALPHANUMEXT);
+        $filename = $idnumber. '_' . $convertedquizname . '_' . $attemptid . '_' . $time . '_' . substr($contenthash,0,8) . '.pdf';
+        // IT.Serv end: change filename pattern (1/1)
+
 
         // Write file into filesystem?
         if ($this->exportfilesystem) {
